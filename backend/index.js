@@ -4,6 +4,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./utils/db.js"; // ✅ Corrected spelling
 import userRoutes from "./routes/user.routes.js";
+import companyRoutes from "./routes/company.routes.js";
+import jobRoutes from "./routes/job.routes.js"; // ✅ Corrected spelling
+import applicationRoutes from "./routes/application.routes.js"
 
 dotenv.config();
 
@@ -27,11 +30,19 @@ app.get("/home", (req, res) => {
         success: true
     });
 });
-// "http://localhost:8000/api/v1/user/register"
-// "http://localhost:8000/api/v1/user/login"
-// "http://localhost:8000/api/v1/user/profile/update"
+
 // User Routes
 app.use("/api/v1/user", userRoutes);
+
+//company Routes
+app.use("/api/v1/company", companyRoutes);
+
+//Job Routes
+app.use("/api/v1/job", jobRoutes);
+
+//application Routes
+app.use("/api/v1/application", applicationRoutes); // ✅ Corrected spelling
+
 
 // Server Listen
 const port = process.env.PORT || 3000;
