@@ -1,27 +1,13 @@
 import express from "express";
 import isAuthenticated from "../middleware/isAuthenticated.js";
-import {
-  applyJob,
-  getAppliedJobs,
-  getApplicants,
-  updateStatus
-} from "../controller/application.controller.js";
-
+import { applyJob, getApplicants, getAppliedJobs, updateStatus } from "../controllers/application.controller.js";
+ 
 const router = express.Router();
 
-// Apply to a job
-// POST /api/v1/application/apply/:id
 router.route("/apply/:id").post(isAuthenticated, applyJob);
-
-// Get all jobs applied to (for the logged in user)
-router.route("/applied").get(isAuthenticated, getAppliedJobs);
-
-// Get all applicants for a specific job (for admin use)
-// :id here is the Job ID
-router.route("/applicants/:id").get(isAuthenticated, getApplicants);
-
-// Update status for a specific application (for admin use)
-// :id here is the Application ID
-router.route("/status/:id").put(isAuthenticated, updateStatus);
+router.route("/get").get(isAuthenticated, getAppliedJobs);
+router.route("/:id/applicants").get(isAuthenticated, getApplicants);
+router.route("/status/:id/update").post(isAuthenticated, updateStatus);
+ 
 
 export default router;

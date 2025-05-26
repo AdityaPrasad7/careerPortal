@@ -41,7 +41,7 @@ app.use("/api/v1/company", companyRoutes);
 app.use("/api/v1/job", jobRoutes);
 
 //application Routes
-app.use("/api/v1/application", applicationRoutes); // ✅ Corrected spelling
+app.use("/api/v1/application", applicationRoutes);
 
 
 // Server Listen

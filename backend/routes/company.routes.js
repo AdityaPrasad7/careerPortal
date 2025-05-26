@@ -1,24 +1,13 @@
 import express from "express";
-import { 
-    registerCompany,
-    getCompany,
-    getCompanyById,
-    updateCompany
-} from "../controller/company.controller.js";
 import isAuthenticated from "../middleware/isAuthenticated.js";
+import { getCompany, getCompanyById, registerCompany, updateCompany } from "../controllers/company.controller.js";
+import { singleUpload } from "../middleware/multer.js";
 
 const router = express.Router();
 
-// Register a new company
-router.post("/register", isAuthenticated, registerCompany);
-
-// Get all companies of the logged-in user
-router.get("/", isAuthenticated, getCompany);
-
-// Get a specific company by ID
-router.get("/:id", isAuthenticated, getCompanyById);
-
-// Update a specific company by ID
-router.put("/:id", isAuthenticated, updateCompany);
+router.route("/register").post(isAuthenticated,registerCompany);
+router.route("/get").get(isAuthenticated,getCompany);
+router.route("/get/:id").get(isAuthenticated,getCompanyById);
+router.route("/update/:id").put(isAuthenticated,singleUpload, updateCompany);
 
 export default router;

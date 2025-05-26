@@ -44,6 +44,11 @@ const Signup = () => {
             formData.append("file", input.file);
         }
 
+        // Log FormData contents
+        for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+    }
+
         try {
             dispatch(setLoading(true));
             const res = await axios.post(`${USER_API_END_POINT}/register`, formData, {
@@ -55,7 +60,14 @@ const Signup = () => {
                 toast.success(res.data.message);
             }
         } catch (error) {
-            console.log(error);
+            
+            console.error("Full error details:", error);
+        if (error.response) {
+            console.error("Response data:", error.response.data);
+            console.error("Response status:", error.response.status);
+            console.error("Response headers:", error.response.headers);
+        }
+
             toast.error(error.response.data.message);
         } finally{
             dispatch(setLoading(false));
@@ -80,7 +92,7 @@ const Signup = () => {
                             value={input.fullname}
                             name="fullname"
                             onChange={changeEventHandler}
-                            placeholder="patel"
+                            placeholder="John Doe"
                         />
                     </div>
                     <div className='my-2'>
