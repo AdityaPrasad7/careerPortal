@@ -5,11 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
+    "start": "node index.js",
+    "build": "echo 'No build step required for backend'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Aditya",
   "license": "ISC",
-  "description": "",
+  "description": "Job Portal Backend API",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.6.1",
