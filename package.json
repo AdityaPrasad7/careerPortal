@@ -4,12 +4,11 @@
   "description": "Full Stack Job Portal Application",
   "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "predeploy": "vite build",
-    "deploy": "gh-pages -d dist"
+    "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
+    "build": "cd frontend && npm run build && cd ../backend && npm run build",
+    "start": "concurrently \"cd backend && npm start\" \"cd frontend && npm start\"",
+    "deploy": "npm run build && git add . && git commit -m 'Deploy' && git push heroku main"
   },
   "keywords": [
     "job-portal",
