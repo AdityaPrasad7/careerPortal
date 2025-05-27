@@ -20,7 +20,8 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
         phoneNumber: user?.phoneNumber || "",
         bio: user?.profile?.bio || "",
         skills: user?.profile?.skills?.map(skill => skill) || "",
-        file: user?.profile?.resume || ""
+        resume: user?.profile?.resume || "",
+        profilePhoto: null
     });
     const dispatch = useDispatch();
 
@@ -30,7 +31,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
 
     const fileChangeHandler = (e) => {
         const file = e.target.files?.[0];
-        setInput({ ...input, file })
+        setInput({ ...input, [e.target.name]: file });
     }
 
     const submitHandler = async (e) => {
@@ -41,8 +42,11 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
         formData.append("phoneNumber", input.phoneNumber);
         formData.append("bio", input.bio);
         formData.append("skills", input.skills);
-        if (input.file) {
-            formData.append("file", input.file);
+        if (input.resume) {
+            formData.append("file", input.resume);
+        }
+        if (input.profilePhoto) {
+            formData.append("profilePhoto", input.profilePhoto);
         }
         try {
             setLoading(true);
@@ -63,10 +67,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
             setLoading(false);
         }
         setOpen(false);
-        console.log(input);
     }
-
-
 
     return (
         <div>
@@ -81,7 +82,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                                 <Label htmlFor="name" className="text-right">Name</Label>
                                 <Input
                                     id="name"
-                                    name="name"
+                                    name="fullname"
                                     type="text"
                                     value={input.fullname}
                                     onChange={changeEventHandler}
@@ -100,10 +101,10 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                                 />
                             </div>
                             <div className='grid grid-cols-4 items-center gap-4'>
-                                <Label htmlFor="number" className="text-right">Number</Label>
+                                <Label htmlFor="phoneNumber" className="text-right">Number</Label>
                                 <Input
-                                    id="number"
-                                    name="number"
+                                    id="phoneNumber"
+                                    name="phoneNumber"
                                     value={input.phoneNumber}
                                     onChange={changeEventHandler}
                                     className="col-span-3"
@@ -130,12 +131,23 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                                 />
                             </div>
                             <div className='grid grid-cols-4 items-center gap-4'>
-                                <Label htmlFor="file" className="text-right">Resume</Label>
+                                <Label htmlFor="resume" className="text-right">Resume</Label>
                                 <Input
-                                    id="file"
-                                    name="file"
+                                    id="resume"
+                                    name="resume"
                                     type="file"
                                     accept="application/pdf"
+                                    onChange={fileChangeHandler}
+                                    className="col-span-3"
+                                />
+                            </div>
+                            <div className='grid grid-cols-4 items-center gap-4'>
+                                <Label htmlFor="profilePhoto" className="text-right">Profile Photo</Label>
+                                <Input
+                                    id="profilePhoto"
+                                    name="profilePhoto"
+                                    type="file"
+                                    accept="image/*"
                                     onChange={fileChangeHandler}
                                     className="col-span-3"
                                 />

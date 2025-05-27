@@ -1,5 +1,7 @@
 import { Application } from "../models/application.model.js";
 import { Job } from "../models/job.model.js";
+import { User } from "../models/user.model.js";
+import { sendApplicationConfirmation } from "../utils/email.js";
 
 export const applyJob = async (req, res) => {
     try {
@@ -22,27 +24,54 @@ export const applyJob = async (req, res) => {
         }
 
         // check if the jobs exists
-        const job = await Job.findById(jobId);
+        const job = await Job.findById(jobId).populate('company');
         if (!job) {
             return res.status(404).json({
                 message: "Job not found",
                 success: false
             })
         }
+
+        // Get user details for email
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+                success: false
+            });
+        }
+
         // create a new application
         const newApplication = await Application.create({
-            job:jobId,
-            applicant:userId,
+            job: jobId,
+            applicant: userId,
         });
 
         job.applications.push(newApplication._id);
         await job.save();
+
+        // Send confirmation email
+        try {
+            await sendApplicationConfirmation(
+                user.email,
+                job.title,
+                job.company.name
+            );
+        } catch (emailError) {
+            console.error('Error sending confirmation email:', emailError);
+            // Don't fail the application if email fails
+        }
+
         return res.status(201).json({
-            message:"Job applied successfully.",
-            success:true
-        })
+            message: "Job applied successfully.",
+            success: true
+        });
     } catch (error) {
         console.log(error);
+        return res.status(500).json({
+            message: "Error applying for job",
+            success: false
+        });
     }
 };
 export const getAppliedJobs = async (req,res) => {

@@ -19,7 +19,8 @@ import PostJob from './components/admin/PostJob'
 import Applicants from './components/admin/Applicants'
 import { RouterProvider } from 'react-router'
 import AdminJobs from './components/Admin/AdminJobs'
-import AppliedJobsPage from './components/AppliedJobsPage' // Import the new component
+import AppliedJobsPage from './components/AppliedJobsPage'
+import SavedJobs from './components/SavedJobs'
 
 const appRouter = createBrowserRouter([
   {
@@ -51,8 +52,12 @@ const appRouter = createBrowserRouter([
     element: <Profile/>
   },
   {
-    path: "/applied-jobs", // New route for applied jobs
+    path: "/applied-jobs",
     element: <AppliedJobsPage/>
+  },
+  {
+    path: "/saved-jobs",
+    element: <SavedJobs/>
   },
   {
     path:"/admin/companies",

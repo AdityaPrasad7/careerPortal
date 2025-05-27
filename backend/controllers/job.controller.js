@@ -139,21 +139,51 @@ export const saveJob = async (req, res) => {
         const { jobId } = req.body;
         const userId = req.id;
 
+        console.log('Save job request:', { jobId, userId });
+
+        if (!jobId) {
+            console.log('Job ID missing');
+            return res.status(400).json({
+                message: "Job ID is required",
+                success: false
+            });
+        }
+
         // Check if job exists
         const job = await Job.findById(jobId);
         if (!job) {
+            console.log('Job not found:', jobId);
             return res.status(404).json({
                 message: "Job not found",
                 success: false
             });
         }
 
-        // Add to saved jobs (using $addToSet to prevent duplicates)
-        const user = await User.findByIdAndUpdate(
-            userId,
-            { $addToSet: { savedJobs: jobId } },
-            { new: true }
-        );
+        // Check if user exists
+        const user = await User.findById(userId);
+        if (!user) {
+            console.log('User not found:', userId);
+            return res.status(404).json({
+                message: "User not found",
+                success: false
+            });
+        }
+
+        // Check if job is already saved
+        const isAlreadySaved = user.savedJobs.some(id => id.toString() === jobId);
+        if (isAlreadySaved) {
+            console.log('Job already saved:', jobId);
+            return res.status(400).json({
+                message: "Job is already saved",
+                success: false
+            });
+        }
+
+        // Add to saved jobs
+        user.savedJobs.push(jobId);
+        await user.save();
+
+        console.log('Job saved successfully:', { jobId, userId });
 
         return res.status(200).json({
             message: "Job saved successfully",
@@ -161,7 +191,7 @@ export const saveJob = async (req, res) => {
             savedJobs: user.savedJobs
         });
     } catch (error) {
-        console.log(error);
+        console.error("Save job error:", error);
         return res.status(500).json({
             message: "Error saving job",
             error: error.message,
@@ -176,12 +206,41 @@ export const unsaveJob = async (req, res) => {
         const { jobId } = req.body;
         const userId = req.id;
 
+        console.log('Unsave job request:', { jobId, userId });
+
+        if (!jobId) {
+            console.log('Job ID missing');
+            return res.status(400).json({
+                message: "Job ID is required",
+                success: false
+            });
+        }
+
+        // Check if user exists
+        const user = await User.findById(userId);
+        if (!user) {
+            console.log('User not found:', userId);
+            return res.status(404).json({
+                message: "User not found",
+                success: false
+            });
+        }
+
+        // Check if job is saved
+        const isSaved = user.savedJobs.some(id => id.toString() === jobId);
+        if (!isSaved) {
+            console.log('Job not saved:', jobId);
+            return res.status(400).json({
+                message: "Job is not saved",
+                success: false
+            });
+        }
+
         // Remove from saved jobs
-        const user = await User.findByIdAndUpdate(
-            userId,
-            { $pull: { savedJobs: jobId } },
-            { new: true }
-        );
+        user.savedJobs = user.savedJobs.filter(id => id.toString() !== jobId);
+        await user.save();
+
+        console.log('Job unsaved successfully:', { jobId, userId });
 
         return res.status(200).json({
             message: "Job removed from saved",
@@ -189,7 +248,7 @@ export const unsaveJob = async (req, res) => {
             savedJobs: user.savedJobs
         });
     } catch (error) {
-        console.log(error);
+        console.error("Unsave job error:", error);
         return res.status(500).json({
             message: "Error unsaving job",
             error: error.message,
@@ -223,7 +282,7 @@ export const getSavedJobs = async (req, res) => {
             success: true
         });
     } catch (error) {
-        console.log(error);
+        console.error("Get saved jobs error:", error);
         return res.status(500).json({
             message: "Error fetching saved jobs",
             error: error.message,

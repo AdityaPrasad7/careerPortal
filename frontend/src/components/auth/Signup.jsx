@@ -41,13 +41,13 @@ const Signup = () => {
         formData.append("password", input.password);
         formData.append("role", input.role);
         if (input.file) {
-            formData.append("file", input.file);
+            formData.append("profilePhoto", input.file);
         }
 
         // Log FormData contents
         for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-    }
+            console.log(key, value);
+        }
 
         try {
             dispatch(setLoading(true));

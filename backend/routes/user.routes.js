@@ -1,13 +1,21 @@
 import express from "express";
-import { login, logout, register, updateProfile } from "../controllers/user.controller.js";
+import {
+    login,
+    logout,
+    register,
+    updateProfile
+} from "../controllers/user.controller.js";
 import isAuthenticated from "../middleware/isAuthenticated.js";
 import { singleUpload } from "../middleware/multer.js";
- 
+
 const router = express.Router();
 
-router.route("/register").post(singleUpload,register);
-router.route("/login").post(login);
-router.route("/logout").get(logout);
-router.route("/profile/update").post(isAuthenticated,singleUpload,updateProfile);
+// Auth routes
+router.post("/register", singleUpload, register);
+router.post("/login", login);
+router.get("/logout", logout);
+
+// Profile routes
+router.put("/update", isAuthenticated, singleUpload, updateProfile);
 
 export default router;

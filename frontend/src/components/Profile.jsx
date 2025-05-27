@@ -1,74 +1,118 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navbar from './shared/Navbar'
 import { Avatar, AvatarImage } from './ui/avatar'
 import { Button } from './ui/button'
-import { Contact, Mail, Pen, Briefcase } from 'lucide-react'
+import { Contact, Mail, Pen, Briefcase, Bookmark } from 'lucide-react'
 import { Badge } from './ui/badge'
 import { Label } from './ui/label'
 import UpdateProfileDialog from './UpdateProfileDialog'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-
-const isResume = true;
+import axios from 'axios'
 
 const Profile = () => {
-    const [open, setOpen] = useState(false);
-    const {user} = useSelector(store=>store.auth);
-    const navigate = useNavigate();
+    const [open, setOpen] = useState(false)
+    const { user } = useSelector(store => store.auth)
+    const navigate = useNavigate()
+
+    // Saved jobs state
+    const [savedJobs, setSavedJobs] = useState([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const fetchSavedJobs = async () => {
+            setLoading(true)
+            try {
+                const { data } = await axios.get('http://localhost:8000/api/v1/job/saved', { withCredentials: true })
+                if (data.success) {
+                    setSavedJobs(data.savedJobs)
+                } else {
+                    console.error('Failed to fetch saved jobs:', data.message)
+                }
+            } catch (error) {
+                console.error('Failed to fetch saved jobs:', error.response?.data?.message || error.message)
+            } finally {
+                setLoading(false)
+            }
+        }
+        if (user) fetchSavedJobs()
+    }, [user])
+
+    if (!user) return <div className="text-center mt-10">Loading profile...</div>
 
     return (
         <div>
             <Navbar />
-            <div className='max-w-4xl mx-auto bg-white border border-gray-200 rounded-2xl my-5 p-8'>
-                <div className='flex justify-between'>
-                    <div className='flex items-center gap-4'>
+            <div className="max-w-4xl mx-auto bg-white border border-gray-200 rounded-2xl my-5 p-8">
+                <div className="flex justify-between">
+                    <div className="flex items-center gap-4">
                         <Avatar className="h-24 w-24">
-                            <AvatarImage src="https://www.shutterstock.com/image-vector/circle-line-simple-design-logo-600nw-2174926871.jpg" alt="profile" />
+                            <AvatarImage
+                                src={user?.profile?.profilePhoto || "https://www.shutterstock.com/image-vector/circle-line-simple-design-logo-600nw-2174926871.jpg"}
+                                alt={user?.fullname}
+                            />
                         </Avatar>
                         <div>
-                            <h1 className='font-medium text-xl'>{user?.fullname}</h1>
-                            <p>{user?.profile?.bio}</p>
+                            <h1 className="font-medium text-xl">{user?.fullname}</h1>
+                            <p>{user?.profile?.bio || "No bio added yet"}</p>
                         </div>
                     </div>
-                    <Button onClick={() => setOpen(true)} className="text-right" variant="outline"><Pen /></Button>
+                    <Button onClick={() => setOpen(true)} className="text-right" variant="outline">
+                        <Pen />
+                    </Button>
                 </div>
-                <div className='my-5'>
-                    <div className='flex items-center gap-3 my-2'>
+
+                <div className="my-5">
+                    <div className="flex items-center gap-3 my-2">
                         <Mail />
                         <span>{user?.email}</span>
                     </div>
-                    <div className='flex items-center gap-3 my-2'>
+                    <div className="flex items-center gap-3 my-2">
                         <Contact />
                         <span>{user?.phoneNumber}</span>
                     </div>
                 </div>
-                <div className='my-5'>
+
+                <div className="my-5">
                     <h1>Skills</h1>
-                    <div className='flex items-center gap-1'>
-                        {
-                            user?.profile?.skills.length !== 0 ? user?.profile?.skills.map((item, index) => <Badge key={index}>{item}</Badge>) : <span>NA</span>
-                        }
+                    <div className="flex items-center gap-1 flex-wrap">
+                        {user?.profile?.skills?.length > 0 ? (
+                            user.profile.skills.map((item, index) => <Badge key={index}>{item}</Badge>)
+                        ) : (
+                            <span>No skills added yet</span>
+                        )}
                     </div>
                 </div>
-                <div className='grid w-full max-w-sm items-center gap-1.5'>
+
+                <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label className="text-md font-bold">Resume</Label>
-                    {
-                        isResume ? <a target='blank' href={user?.profile?.resume} className='text-blue-500 w-full hover:underline cursor-pointer'>{user?.profile?.resumeOriginalName}</a> : <span>NA</span>
-                    }
-                </div> 
+                    {user?.profile?.resume ? (
+                        <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={user.profile.resume}
+                            className="text-blue-500 w-full hover:underline cursor-pointer"
+                        >
+                            {user?.profile?.resumeOriginalName}
+                        </a>
+                    ) : (
+                        <span>No resume uploaded yet</span>
+                    )}
+                </div>
             </div>
-            <div className='max-w-4xl mx-auto bg-white rounded-2xl p-8 my-5'>
-                <div className='flex justify-between items-center mb-5'>
-                    
-                    <Button 
-                        onClick={() => navigate('/applied-jobs')} 
-                        variant="outline"
-                    >
+
+            <div className="max-w-4xl mx-auto bg-white rounded-2xl p-8 my-5">
+                <div className="flex justify-between items-center mb-5">
+                    <Button onClick={() => navigate('/applied-jobs')} variant="outline">
                         <Briefcase className="mr-2 h-4 w-4" /> View All Applied Jobs
+                    </Button>
+                    <Button onClick={() => navigate('/saved-jobs')} variant="outline">
+                        <Bookmark className="mr-2 h-4 w-4" /> View Saved Jobs
                     </Button>
                 </div>
             </div>
-            <UpdateProfileDialog open={open} setOpen={setOpen}/>
+
+            <UpdateProfileDialog open={open} setOpen={setOpen} />
         </div>
     )
 }

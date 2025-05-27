@@ -1,4 +1,33 @@
 import multer from "multer";
 
 const storage = multer.memoryStorage();
-export const singleUpload = multer({storage}).single("file");
+
+// File filter function
+const fileFilter = (req, file, cb) => {
+    // Accept images only
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+        return cb(new Error('Only image files are allowed!'), false);
+    }
+    cb(null, true);
+};
+
+// Single file upload for registration
+export const singleUpload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    }
+}).single('profilePhoto');
+
+// Multiple file upload for profile updates
+export const multipleUpload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    }
+}).fields([
+    { name: 'profilePhoto', maxCount: 1 },
+    { name: 'file', maxCount: 1 } // for resume
+]);
