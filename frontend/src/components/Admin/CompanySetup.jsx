@@ -65,7 +65,7 @@ const CompanySetup = () => {
             data.append("website", formData.website);
             data.append("location", formData.location);
             if (formData.file) {
-                data.append("file", formData.file);
+                data.append("profilePhoto", formData.file);
             }
 
             // Changed to match backend route

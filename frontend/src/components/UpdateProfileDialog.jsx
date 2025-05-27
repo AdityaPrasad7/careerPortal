@@ -50,7 +50,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
         }
         try {
             setLoading(true);
-            const res = await axios.post(`${USER_API_END_POINT}/profile/update`, formData, {
+            const res = await axios.put(`${USER_API_END_POINT}/update`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
@@ -59,14 +59,14 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
             if (res.data.success) {
                 dispatch(setUser(res.data.user));
                 toast.success(res.data.message);
+                setOpen(false);
             }
         } catch (error) {
-            console.log(error);
-            toast.error(error.response.data.message);
-        } finally{
+            console.error("Profile update error:", error);
+            toast.error(error.response?.data?.message || "Failed to update profile");
+        } finally {
             setLoading(false);
         }
-        setOpen(false);
     }
 
     return (

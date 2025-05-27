@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { APPLICATION_API_END_POINT, JOB_API_END_POINT } from '@/utils/constant';
 import { setSingleJob } from '@/redux/jobSlice';
+import { setUser } from '@/redux/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 
@@ -38,6 +39,14 @@ const JobDescription = () => {
                 ]
             };
             dispatch(setSingleJob(updatedSingleJob));
+
+            // Update user's saved jobs in Redux store
+            const updatedUser = {
+                ...user,
+                savedJobs: user.savedJobs.filter(id => id !== jobId)
+            };
+            dispatch(setUser(updatedUser));
+
             toast.success(res.data.message);
         }
     } catch (error) {

@@ -23,7 +23,8 @@ export const register = async (req, res) => {
         let profilePhotoUrl = "https://res.cloudinary.com/du0w84p1k/image/upload/v1716731234/default-profile_iyqjqz.png";
         if (req.file) {
             try {
-                const result = await cloudinary.uploader.upload(req.file.path, {
+                const fileUri = getDataUri(req.file);
+                const result = await cloudinary.uploader.upload(fileUri.content, {
                     folder: "profile_photos",
                     width: 300,
                     crop: "scale"
@@ -179,7 +180,10 @@ export const updateProfile = async (req, res) => {
         // Handle resume upload
         if (req.files && req.files.file) {
             const fileUri = getDataUri(req.files.file[0]);
-            const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+            const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+                folder: "resumes",
+                resource_type: "auto"
+            });
             user.profile.resume = cloudResponse.secure_url;
             user.profile.resumeOriginalName = req.files.file[0].originalname;
         }
@@ -187,12 +191,17 @@ export const updateProfile = async (req, res) => {
         // Handle profile photo upload
         if (req.files && req.files.profilePhoto) {
             const fileUri = getDataUri(req.files.profilePhoto[0]);
-            const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+            const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+                folder: "profile_photos",
+                width: 300,
+                crop: "scale"
+            });
             user.profile.profilePhoto = cloudResponse.secure_url;
         }
 
         await user.save();
 
+        // Create user object without password
         user = {
             _id: user._id,
             fullname: user.fullname,
@@ -205,7 +214,7 @@ export const updateProfile = async (req, res) => {
 
         return res.status(200).json({ message: "Profile updated successfully.", user, success: true });
     } catch (error) {
-        console.error(error);
+        console.error("Profile update error:", error);
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 };

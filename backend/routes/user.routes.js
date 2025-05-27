@@ -6,7 +6,7 @@ import {
     updateProfile
 } from "../controllers/user.controller.js";
 import isAuthenticated from "../middleware/isAuthenticated.js";
-import { singleUpload } from "../middleware/multer.js";
+import { singleUpload, multipleUpload } from "../middleware/multer.js";
 
 const router = express.Router();
 
@@ -16,6 +16,6 @@ router.post("/login", login);
 router.get("/logout", logout);
 
 // Profile routes
-router.put("/update", isAuthenticated, singleUpload, updateProfile);
+router.put("/update", isAuthenticated, multipleUpload, updateProfile);
 
 export default router;

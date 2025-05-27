@@ -1,4 +1,3 @@
-
 import React from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { Button } from '../ui/button'
@@ -51,8 +50,6 @@ const Navbar = () => {
                                 </>
                             )
                         }
-
-
                     </ul>
                     {
                         !user ? (
@@ -63,15 +60,23 @@ const Navbar = () => {
                         ) : (
                             <Popover>
                                 <PopoverTrigger asChild>
-                                    <Avatar className="cursor-pointer">
-                                        <AvatarImage src={user?.profile?.profilePhoto} alt="@shadcn" />
+                                    <Avatar className="cursor-pointer h-10 w-10">
+                                        <AvatarImage 
+                                            src={user?.profile?.profilePhoto || "https://res.cloudinary.com/du0w84p1k/image/upload/v1716731234/default-profile_iyqjqz.png"} 
+                                            alt={user?.fullname || "User"} 
+                                            className="object-cover"
+                                        />
                                     </Avatar>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80">
                                     <div className=''>
                                         <div className='flex gap-2 space-y-2'>
-                                            <Avatar className="cursor-pointer">
-                                                <AvatarImage src={user?.profile?.profilePhoto} alt="@shadcn" />
+                                            <Avatar className="cursor-pointer h-10 w-10">
+                                                <AvatarImage 
+                                                    src={user?.profile?.profilePhoto || "https://res.cloudinary.com/du0w84p1k/image/upload/v1716731234/default-profile_iyqjqz.png"} 
+                                                    alt={user?.fullname || "User"} 
+                                                    className="object-cover"
+                                                />
                                             </Avatar>
                                             <div>
                                                 <h4 className='font-medium'>{user?.fullname}</h4>
@@ -79,14 +84,14 @@ const Navbar = () => {
                                             </div>
                                         </div>
                                         <div className='flex flex-col my-2 text-gray-600'>
-                                            {
-                                                user && user.role === 'student' && (
-                                                    <div className='flex w-fit items-center gap-2 cursor-pointer'>
-                                                        <User2 />
-                                                        <Button variant="link"> <Link to="/profile">View Profile</Link></Button>
-                                                    </div>
-                                                )
-                                            }
+                                            <div className='flex w-fit items-center gap-2 cursor-pointer'>
+                                                <User2 />
+                                                <Button variant="link">
+                                                    <Link to={user?.role === 'recruiter' ? "/admin/profile" : "/profile"}>
+                                                        View Profile
+                                                    </Link>
+                                                </Button>
+                                            </div>
 
                                             <div className='flex w-fit items-center gap-2 cursor-pointer'>
                                                 <LogOut />
@@ -98,10 +103,8 @@ const Navbar = () => {
                             </Popover>
                         )
                     }
-
                 </div>
             </div>
-
         </div>
     )
 }

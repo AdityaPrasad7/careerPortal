@@ -50,6 +50,12 @@ export const applyJob = async (req, res) => {
         job.applications.push(newApplication._id);
         await job.save();
 
+        // Remove job from saved jobs if it exists
+        if (user) {
+            user.savedJobs = user.savedJobs.filter(id => id.toString() !== jobId);
+            await user.save();
+        }
+
         // Send confirmation email
         try {
             await sendApplicationConfirmation(
