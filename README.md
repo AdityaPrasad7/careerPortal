@@ -1,46 +1,134 @@
-# Job Portal
+# Job Portal Backend
 
-A full-stack job portal application built with the MERN stack (MongoDB, Express.js, React, Node.js).
+This is the backend API for the Job Portal application, built with Node.js, Express.js, and MongoDB.
+
+## Directory Structure
+
+```
+backend/
+├── controllers/     # Business logic and request handlers
+├── middleware/      # Custom middleware functions
+├── models/         # MongoDB schemas and models
+├── routes/         # API route definitions
+├── utils/          # Utility functions and configurations
+├── index.js        # Main application file
+└── package.json    # Project dependencies and scripts
+```
+
+## API Endpoints
+
+### Authentication Routes (`/api/v1/user`)
+- `POST /register` - Register a new user (Student/Recruiter)
+- `POST /login` - User login
+- `GET /logout` - User logout
+- `PUT /update-profile` - Update user profile
+
+### Company Routes (`/api/v1/company`)
+- `POST /register` - Register a new company
+- `GET /:id` - Get company details
+- `PUT /:id` - Update company information
+
+### Job Routes (`/api/v1/job`)
+- `POST /post` - Create a new job posting
+- `GET /` - Get all jobs
+- `GET /:id` - Get job details
+- `PUT /:id` - Update job posting
+- `DELETE /:id` - Delete job posting
+
+### Application Routes (`/api/v1/application`)
+- `POST /apply/:id` - Apply for a job
+- `GET /my-applications` - Get user's applications
+- `GET /job/:id` - Get applications for a specific job
 
 ## Features
 
-- User authentication (Student/Recruiter)
-- Company registration and management
-- Job posting and application
-- Profile management
-- Email notifications
-- File uploads (Resume, Profile Photo)
-- Responsive design
+### Authentication
+- JWT-based authentication
+- Role-based access control (Student/Recruiter)
+- Secure password hashing with bcrypt
+- HTTP-only cookies for token storage
 
-## Tech Stack
+### File Upload
+- Profile photo upload using Multer
+- Resume upload functionality
+- Cloudinary integration for file storage
+- File size and type validation
 
-### Frontend
-- React
-- Redux Toolkit
-- Tailwind CSS
-- Axios
-- React Router
-- Vite
+### Email Notifications
+- Welcome emails on registration
+- Application confirmation emails
+- Nodemailer integration with Gmail SMTP
+- HTML email templates
 
-### Backend
-- Node.js
-- Express.js
-- MongoDB
-- JWT Authentication
-- Nodemailer
-- Cloudinary
-- Multer
+### Database
+- MongoDB with Mongoose ODM
+- Schema validation
+- Relationship management
+- Indexing for better performance
 
-## Prerequisites
+## Models
 
-- Node.js (>= 18.0.0)
-- MongoDB
-- npm or yarn
+### User Model
+```javascript
+{
+    fullname: String,
+    email: String,
+    phoneNumber: Number,
+    password: String,
+    role: String,
+    profile: {
+        bio: String,
+        skills: [String],
+        resume: String,
+        resumeOriginalName: String,
+        company: ObjectId,
+        profilePhoto: String
+    },
+    savedJobs: [ObjectId]
+}
+```
+
+### Company Model
+```javascript
+{
+    name: String,
+    userId: ObjectId,
+    // Additional company details
+}
+```
+
+### Job Model
+```javascript
+{
+    title: String,
+    description: String,
+    requirements: [String],
+    salary: Number,
+    location: String,
+    jobType: String,
+    experienceLevel: String,
+    position: String,
+    company: ObjectId,
+    created_by: ObjectId,
+    applications: [ObjectId]
+}
+```
+
+### Application Model
+```javascript
+{
+    job: ObjectId,
+    applicant: ObjectId,
+    status: String,
+    // Additional application details
+}
+```
 
 ## Environment Variables
 
-### Backend (.env)
-```
+Create a `.env` file in the backend directory with the following variables:
+
+```env
 PORT=3000
 MONGO_URI=your_mongodb_uri
 SECRET_KEY=your_jwt_secret
@@ -51,41 +139,97 @@ API_KEY=your_cloudinary_api_key
 API_SECRET=your_cloudinary_api_secret
 ```
 
-### Frontend (.env)
-```
-VITE_API_URL=http://localhost:3000/api/v1
-```
+## Dependencies
+
+- `express`: Web framework
+- `mongoose`: MongoDB ODM
+- `bcryptjs`: Password hashing
+- `jsonwebtoken`: JWT authentication
+- `cookie-parser`: Cookie parsing
+- `cors`: Cross-origin resource sharing
+- `dotenv`: Environment variables
+- `multer`: File upload handling
+- `cloudinary`: Cloud storage
+- `nodemailer`: Email functionality
+- `datauri`: File handling
 
 ## Installation
 
-1. Clone the repository:
+1. Install dependencies:
 ```bash
-git clone https://github.com/yourusername/job-portal.git
-cd job-portal
+npm install
 ```
 
-2. Install dependencies:
-```bash
-npm run install-all
-```
+2. Set up environment variables:
+- Copy `.env.example` to `.env`
+- Fill in your environment variables
 
-3. Set up environment variables:
-   - Create `.env` files in both frontend and backend directories
-   - Add the required environment variables
-
-4. Start the development server:
+3. Start the development server:
 ```bash
 npm run dev
 ```
 
-## Available Scripts
+## API Documentation
 
-- `npm run install-all`: Install dependencies for all packages
-- `npm run dev`: Start development servers
-- `npm run build`: Build for production
-- `npm start`: Start production servers
+### Authentication Headers
+All protected routes require a valid JWT token in the cookies.
 
-## Deployment
+### Request/Response Format
+- All responses follow the format:
+```javascript
+{
+    success: boolean,
+    message: string,
+    data?: any,
+    error?: string
+}
+```
+
+### Error Handling
+- 400: Bad Request
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not Found
+- 500: Internal Server Error
+
+## Security Features
+
+1. **Password Security**
+   - Bcrypt hashing
+   - Salt rounds: 10
+
+2. **JWT Security**
+   - HTTP-only cookies
+   - 24-hour expiration
+   - Secure in production
+
+3. **File Upload Security**
+   - File size limits
+   - File type validation
+   - Secure cloud storage
+
+4. **CORS Configuration**
+   - Specific origin allowance
+   - Credentials support
+   - Method restrictions
+
+## Development
+
+### Running Tests
+```bash
+npm test
+```
+
+### Code Style
+- ESLint configuration
+- Prettier formatting
+
+### Debugging
+- Nodemon for development
+- Console logging
+- Error tracking
+
+## Production Deployment
 
 1. Build the application:
 ```bash
@@ -97,14 +241,36 @@ npm run build
 npm start
 ```
 
+## Best Practices
+
+1. **Error Handling**
+   - Try-catch blocks
+   - Global error middleware
+   - Proper error messages
+
+2. **Code Organization**
+   - MVC pattern
+   - Modular structure
+   - Clear separation of concerns
+
+3. **Security**
+   - Input validation
+   - Sanitization
+   - Rate limiting
+
+4. **Performance**
+   - Database indexing
+   - Query optimization
+   - Caching strategies
+
 ## Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 
-This project is licensed under the ISC License. 
+This project is licensed under the ISC License.
